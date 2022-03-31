@@ -1,0 +1,143 @@
+body,
+html {
+  background-color: white;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  text-align: center;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.ms-Grid-row {
+  margin-top: 10px;
+  flex: 1;
+}
+
+.container {
+  height: 100%;
+  max-width: 1500px;
+  display: inline-flex;
+  flex-direction: column;
+
+  padding: 20px;
+  text-align: left;
+}
+
+main {
+  flex: 1;
+  display: flex;
+}
+
+.configuration {
+  margin-right: 20px;
+}
+
+textarea,
+input {
+  border-radius: 2px;
+  border: 1px solid #201f1e;
+  resize: none;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+.tc-title {
+  margin-left: 20px;
+}
+
+.tc-btn-group {
+  height: 30px;
+  margin: 15px 0 10px 0;
+}
+
+.btn {
+  height: 30px;
+  border-radius: 2px;
+  margin-right: 20px;
+  cursor: pointer;
+  padding: 0 20px;
+  border: 1px solid #201f1e;
+}
+
+.btn .primary {
+  border: 1px solid #0078d4;
+}
+
+.btn:active {
+  transform: scale(0.98);
+  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.iframe-column {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.iframe-container {
+  flex: 1;
+  border-color: #0078d4;
+  border-width: 5px;
+  border-style: solid;
+  margin-top: 10px;
+}
+
+iframe {
+  height: 100%;
+  width: 100%;
+  border: 0;
+}
+
+.input-field {
+  display: flex;
+  margin: 10px 0;
+  min-height: 24px;
+}
+
+.input-field > label {
+  display: inline-block;
+  width: 150px;
+}
+
+.input-field > :last-child {
+  flex: 1;
+}
+
+input {
+  height: 25px;
+}
+
+.status-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.status-message {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tc-input-url {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.mt-50 {
+  margin-top: 50px;
+}

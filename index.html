@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Template Chooser Embedded - Demo App</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link
+      rel="stylesheet"
+      href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"
+      integrity="sha512-Qlv6VSKh1gDKGoJbnyA5RMXYcvnpIqhO++MhIM2fStMcGT9i2T//tSwYFlcyoRRDcDZ+TYHpH8azBBCyhpSeqw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script type="text/javascript" src="tc-embedded.js"></script>
+  </head>
+  <body class="ms-Fabric" dir="ltr">
+    <section class="container">
+      <header>
+        <span class="ms-fontSize-24 ms-fontWeight-bold">Demo App</span>
+        <span class="ms-fontSize-16 ms-fontWeight-regular tc-title"
+          >Template Chooser Embedded</span
+        >
+      </header>
+      <main>
+        <div class="configuration">
+          <div id="query-parameter">
+            <div class="ms-fontSize-16 ms-fontWeight-bold">
+              Query parameters
+            </div>
+            <br />
+            <span class="ms-fontSize-14 ms-fontWeight-regular"
+              >Configure the parameter that are used to launch the Template
+              Chooser Embedded experience.</span
+            >
+            <div class="input-field">
+              <label
+                class="ms-fontWeight-semibold ms-fontSize-14"
+                for="template"
+              >
+                Template
+              </label>
+              <textarea
+                id="template"
+                type="text"
+                rows="8"
+                cols="50"
+                value=""
+              ></textarea>
+            </div>
+            <div class="input-field">
+              <label
+                class="ms-fontWeight-semibold ms-fontSize-14"
+                for="upload-url"
+              >
+                UploadUrl
+              </label>
+              <input id="upload-url" type="text" />
+            </div>
+          </div>
+
+          <div id="template-chooser-output" class="mt-50">
+            <div class="ms-fontSize-16 ms-fontWeight-bold">Output</div>
+            <br />
+            <span class="ms-fontSize-14"
+              >See what status information the Template Chooser embedded
+              returns. Also download the new document created by the Template
+              Chooser embedded experience.</span
+            >
+            <div class="input-field">
+              <label class="ms-fontSize-14 ms-fontWeight-semibold" for="status">
+                Status
+              </label>
+              <div class="status-container ms-fontSize-14">
+                <img
+                  id="spinner"
+                  style="display: none"
+                  src="assets/spinner.gif"
+                />
+                <span id="status" class="status-message"></span>
+              </div>
+            </div>
+            <div class="input-field">
+              <label
+                class="ms-fontSize-14 ms-fontWeight-semibold"
+                for="result-file"
+              >
+                Result file
+              </label>
+              <a
+                id="result-file"
+                href="JavaScript:void(0);"
+                class="ms-fontSize-14"
+              ></a>
+            </div>
+          </div>
+
+          <div id="resources" class="mt-50">
+            <div class="ms-fontSize-16 ms-fontWeight-bold">Resources</div>
+            <br />
+            <span class="ms-fontSize-14 ms-fontWeight-regular"
+              >Learn more about the Template Chooser Embedded Experience.</span
+            >
+            <div class="input-field">
+              <label
+                class="ms-fontSize-14 ms-fontWeight-semibold"
+                for="documentation"
+              >
+                Documentation
+              </label>
+              <a
+                class="ms-fontSize-14"
+                target="_blank"
+                href="https://links.officeatwork.com/templatechooser-documentation"
+                >docs.officeatwork.com</a
+              >
+            </div>
+            <div class="input-field">
+              <label
+                class="ms-fontSize-14 ms-fontWeight-semibold"
+                for="helpCenter"
+              >
+                Help Center
+              </label>
+              <a
+                class="ms-fontSize-14"
+                target="_blank"
+                href="https://links.officeatwork.com/apps-help"
+                >help.officeatwork.com</a
+              >
+            </div>
+            <div class="input-field">
+              <label
+                class="ms-fontSize-14 ms-fontWeight-semibold"
+                for="bookDemo"
+              >
+                Book a demo
+              </label>
+              <a
+                class="ms-fontSize-14"
+                target="_blank"
+                href="https://links.officeatwork.com/templatechooser-demo-embedded"
+                >Template Chooser Embedded Demo</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="iframe-column">
+          <div class="ms-fontSize-16 ms-fontWeight-bold">
+            Template Chooser Embedded
+          </div>
+          <br />
+          <span class="ms-fontSize-14"
+            >Experience how the Template Chooser Embedded could provide access
+            to templates in your own application.</span
+          >
+          <div class="tc-btn-group">
+            <button
+              id="reload-tc"
+              class="btn primary ms-bgColor-themePrimary ms-fontColor-white ms-fontWeight-semibold"
+            >
+              Reload
+            </button>
+            <button
+              id="copy-tc-url"
+              class="btn ms-bgColor-white ms-fontColor-black ms-fontWeight-semibold"
+            >
+              Copy URL
+            </button>
+          </div>
+          <div class="iframe-container" id="iframe-container"></div>
+          <input id="tc-input-url" class="tc-input-url" type="text" />
+        </div>
+      </main>
+    </section>
+  </body>
+</html>
