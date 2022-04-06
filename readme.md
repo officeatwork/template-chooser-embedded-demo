@@ -4,7 +4,7 @@ This repository demonstrates how to embed the officeatwork Template Chooser with
 
 ## Live demo
 
-[Click here](https://officeatwork.github.io/template-chooser-embedded-demo) to see a live demo.
+[Click here](https://template-chooser-embedded-demo.officeatwork.com/) to see a live demo.
 
 ## Running locally
 
