@@ -46,6 +46,7 @@ function handleEvent(event) {
 
     blobDocument = blob;
     $resultFile.innerHTML = fileName;
+    $resultFile.style.display = "inline-block";
     toggleSpinner(false);
   }
 
@@ -90,6 +91,7 @@ function ignite() {
   function reloadIframe() {
     $status.innerHTML = "";
     $resultFile.innerHTML = "";
+    $resultFile.style.display = "none";
     const $iframeContainer = document.getElementById('iframe-container');
 
     const iframe = document.createElement('iframe');

@@ -128,6 +128,7 @@ input {
 }
 
 .status-message {
+  max-width: 700px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
