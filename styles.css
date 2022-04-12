@@ -129,9 +129,7 @@ input {
 
 .status-message {
   max-width: 700px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .tc-input-url {

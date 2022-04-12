@@ -37,7 +37,6 @@ function handleEvent(event) {
       error
     )}</b>`;
     $status.innerHTML = status;
-    $status.title = status;
     toggleSpinner(false);
   }
 
@@ -59,7 +58,6 @@ function handleEvent(event) {
     }
 
     $status.innerHTML = status;
-    $status.title = status;
     toggleSpinner(false);
   }
 }
