@@ -90,6 +90,7 @@ function ignite() {
     $status.innerHTML = "";
     $resultFile.innerHTML = "";
     $resultFile.style.display = "none";
+    toggleSpinner(false);
     const $iframeContainer = document.getElementById('iframe-container');
 
     const iframe = document.createElement('iframe');
