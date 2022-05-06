@@ -124,7 +124,7 @@ function buildEmbeddedUrl() {
 
   let url = `${baseUrl}${buildEmbeddedParams()}`;
 
-  if (routing) {
+  if (routing && routing.length) {
     url += `#${routing.join("#")}`;
   }
 
