@@ -71,6 +71,10 @@ function ignite() {
   $reload = document.querySelector("#reload-tc");
   $copyUrl = document.querySelector("#copy-tc-url");
   $tcInputUrl = document.querySelector("#tc-input-url");
+  $customXmlPart = document.querySelector("#customXmlPart");
+  $insertSampleCustomXmlPart = document.querySelector(
+    "#insert-sample-customxmlpart"
+  );
   $tcInputUrl.value = defaultTemplateChooserDomain;
 
   $reload.addEventListener("click", () => {
@@ -78,12 +82,18 @@ function ignite() {
   });
 
   $copyUrl.addEventListener("click", () => {
-    const embeddedUrl = document.getElementById('template-chooser-embedded-iframe').src;
-    navigator.clipboard.writeText(embeddedUrl);
+    const embeddedUrl = document.getElementById(
+      "template-chooser-embedded-iframe"
+    ).src;
+    window.navigator.clipboard.writeText(embeddedUrl);
   });
 
   $resultFile.addEventListener("click", () => {
     saveAs(blobDocument, $resultFile.innerHTML);
+  });
+
+  $insertSampleCustomXmlPart.addEventListener("click", () => {
+    insertSampleCustomXmlPart();
   });
 
   function reloadIframe() {
@@ -91,13 +101,13 @@ function ignite() {
     $resultFile.innerHTML = "";
     $resultFile.style.display = "none";
     toggleSpinner(false);
-    const $iframeContainer = document.getElementById('iframe-container');
+    const $iframeContainer = document.getElementById("iframe-container");
 
-    const iframe = document.createElement('iframe');
+    const iframe = document.createElement("iframe");
     iframe.src = buildEmbeddedUrl();
-    iframe.id = 'template-chooser-embedded-iframe';
-    iframe.sandbox = 'allow-same-origin allow-popups allow-scripts allow-forms';
-    $iframeContainer.innerHTML = '';
+    iframe.id = "template-chooser-embedded-iframe";
+    iframe.sandbox = "allow-same-origin allow-popups allow-scripts allow-forms";
+    $iframeContainer.innerHTML = "";
     $iframeContainer.appendChild(iframe);
   }
 
@@ -109,24 +119,81 @@ function toggleSpinner(show) {
 }
 
 function buildEmbeddedUrl() {
-  const templateUrl = $template.value.trim();
-  const base64Template = templateUrl.includes('template=')
-    ? new URL(templateUrl).searchParams.get("template")
-    : templateUrl || "";
-  const uploadUrl = $uploadUrl.value.trim();
-
-  const params = new URLSearchParams(
-    `?uploadUrl=${uploadUrl}&template=${base64Template}`
-  ).toString();
-
   const userInputUrl = $tcInputUrl.value || defaultTemplateChooserDomain;
   const [baseUrl, ...routing] = userInputUrl.split("#");
 
-  let url = `${baseUrl}?${params}`;
+  let url = `${baseUrl}${buildEmbeddedParams()}`;
 
   if (routing) {
     url += `#${routing.join("#")}`;
   }
 
   return url;
+}
+
+function buildEmbeddedParams() {
+  const templateParam = buildTemplateParam();
+  const injectParam = buildInjectParam();
+  const uploadUrlParam = buildUploadUrlParam();
+
+  let params = [templateParam, injectParam, uploadUrlParam]
+    .filter((param) => !!param)
+    .join("&");
+
+  return params ? `?${params}` : "";
+}
+
+function buildTemplateParam() {
+  const templateUrl = $template.value.trim();
+  const base64Template = templateUrl.includes("template=")
+    ? new URL(templateUrl).searchParams.get("template")
+    : templateUrl || "";
+
+  return base64Template ? `template=${base64Template}` : "";
+}
+
+function buildInjectParam() {
+  const customXmlPart = $customXmlPart.value.trim();
+  return customXmlPart ? `inject=${encodeCustomXmlPart(customXmlPart)}` : "";
+}
+
+function buildUploadUrlParam() {
+  const uploadUrl = $uploadUrl.value.trim();
+  return uploadUrl ? `uploadUrl=${uploadUrl}` : "";
+}
+
+function insertSampleCustomXmlPart() {
+  const sampleCustomXmlPart = `<Properties xmlns="http://schemas.officeatwork.com/2022/templateProperties">
+<officeatwork_languages>
+  <Value>en</Value>
+  <Value>de</Value>
+</officeatwork_languages>
+<subject>Invitation to branch opening</subject>
+<subject.de>Einladung zur Geschäfstelleneröffnung</subject.de>
+<location>
+  <city>Zug</city>
+  <country>Switzerland</country>
+  <country.de>Schweiz</country.de>
+  <street>Bundesplatz 12</street>
+</location>
+</Properties>`;
+
+  $customXmlPart.value = sampleCustomXmlPart;
+}
+
+function encodeCustomXmlPart(customXmlPart) {
+  const injectedData = [
+    {
+      type: "customxmlpart",
+      base64Xml: encodeUnicodeToBase64(customXmlPart),
+    },
+  ];
+
+  const encodedInjectedData = btoa(JSON.stringify(injectedData));
+
+  return encodedInjectedData;
+}
+
+function encodeUnicodeToBase64(value) {
+  return btoa(unescape(encodeURIComponent(value)));
 }
