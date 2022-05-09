@@ -22,44 +22,55 @@ function handleEvent(event) {
     return;
   }
 
-  if (event.data && event.data.type === "template-chooser-status") {
-    const { status } = event.data;
-    $status.innerHTML = status;
+  if (event.data) {
+    event.data.type === "template-chooser-status" && setStatus(event);
 
-    const showSpinner = status !== "Created";
-    toggleSpinner(showSpinner);
+    event.data.type === "template-chooser-error" && setErrorStatus(event);
+
+    event.data.type === "template-chooser-document-created" &&
+      setCreatedStatus(event);
+
+    event.data.type === "template-chooser-document-uploaded" &&
+      setUploadedStatus(event);
+  }
+}
+
+function setStatus(event) {
+  const { status } = event.data;
+  $status.innerHTML = status;
+
+  const showSpinner = status !== "Created";
+  toggleSpinner(showSpinner);
+}
+
+function setErrorStatus(event) {
+  const status = `Error when creating document, error detail: <b>${JSON.stringify(
+    event.data.error
+  )}</b>`;
+  $status.innerHTML = status;
+  $resultFile.innerHTML = "";
+  toggleSpinner(false);
+}
+
+function setCreatedStatus(event) {
+  const { blob, fileName } = event.data;
+
+  blobDocument = blob;
+  $resultFile.innerHTML = fileName;
+  $resultFile.style.display = "inline-block";
+  toggleSpinner(false);
+}
+
+function setUploadedStatus(event) {
+  const { redirectUrl } = event.data;
+
+  let status = "Document was uploaded";
+  if (redirectUrl) {
+    status += `. Response data: redirectUrl=<a href='${redirectUrl}' target='_blank'>${redirectUrl}</a>`;
   }
 
-  if (event.data && event.data.type === "template-chooser-error") {
-    const { error } = event.data;
-
-    const status = `Error when creating document, error detail: <b>${JSON.stringify(
-      error
-    )}</b>`;
-    $status.innerHTML = status;
-    toggleSpinner(false);
-  }
-
-  if (event.data && event.data.type === "template-chooser-document-created") {
-    const { blob, fileName } = event.data;
-
-    blobDocument = blob;
-    $resultFile.innerHTML = fileName;
-    $resultFile.style.display = "inline-block";
-    toggleSpinner(false);
-  }
-
-  if (event.data && event.data.type === "template-chooser-document-uploaded") {
-    const { redirectUrl } = event.data;
-
-    let status = "Document was uploaded";
-    if (redirectUrl) {
-      status += `. Response data: redirectUrl=<a href='${redirectUrl}' target='_blank'>${redirectUrl}</a>`;
-    }
-
-    $status.innerHTML = status;
-    toggleSpinner(false);
-  }
+  $status.innerHTML = status;
+  toggleSpinner(false);
 }
 
 function ignite() {
@@ -115,7 +126,7 @@ function ignite() {
 }
 
 function toggleSpinner(show) {
-  show ? ($spinner.style.display = "block") : ($spinner.style.display = "none");
+  $spinner.style.display = show ? "block" : "none";
 }
 
 function buildEmbeddedUrl() {
