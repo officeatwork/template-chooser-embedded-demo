@@ -175,6 +175,7 @@ function insertSampleCustomXmlPart() {
   <country>Switzerland</country>
   <country.de>Schweiz</country.de>
   <street>Bundesplatz 12</street>
+  <mapslink>https://www.bing.com/maps?osid=941010b2-4f60-4f55-9683-6ce7f9a2776b&amp;cp=47.172293~8.505079&amp;lvl=16&amp;imgid=aa3a3e86-b5f0-4c53-b3db-b348f9418b88&amp;v=2&amp;sV=2&amp;form=S00027</mapslink>
 </location>
 </Properties>`;
 
