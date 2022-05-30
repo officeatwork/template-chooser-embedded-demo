@@ -28,7 +28,19 @@
       </header>
       <main>
         <div class="configuration">
-          <div id="query-parameter">
+          <div>
+            <div class="ms-fontSize-16 ms-fontWeight-bold">URL</div>
+            <div class="input-field">
+              <label
+                class="ms-fontWeight-semibold ms-fontSize-14"
+                for="template"
+              >
+                Embedded
+              </label>
+              <input id="tc-input-url" class="tc-input-url" type="text" />
+            </div>
+          </div>
+          <div>
             <div class="ms-fontSize-16 ms-fontWeight-bold">
               Query parameters
             </div>
@@ -44,12 +56,7 @@
               >
                 Template
               </label>
-              <textarea
-                id="template"
-                type="text"
-                rows="8"
-                value=""
-              ></textarea>
+              <textarea id="template" type="text" rows="8" value=""></textarea>
             </div>
             <div class="input-field">
               <label
@@ -179,7 +186,7 @@
         </div>
         <div class="iframe-column">
           <div class="ms-fontSize-16 ms-fontWeight-bold">
-            Template Chooser Embedded
+            Integration sample
           </div>
           <br />
           <span class="ms-fontSize-14"
@@ -201,7 +208,6 @@
             </button>
           </div>
           <div class="iframe-container" id="iframe-container"></div>
-          <input id="tc-input-url" class="tc-input-url" type="text" />
         </div>
       </main>
     </section>
