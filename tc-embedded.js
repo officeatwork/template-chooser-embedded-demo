@@ -32,6 +32,9 @@ function handleEvent(event) {
 
     event.data.type === "template-chooser-document-uploaded" &&
       setUploadedStatus(event);
+
+    event.data.type === "template-chooser-template-chosen" &&
+      setTemplateChosenStatus(event);
   }
 }
 
@@ -69,6 +72,13 @@ function setUploadedStatus(event) {
     status += `. Response data: redirectUrl=<a href='${redirectUrl}' target='_blank'>${redirectUrl}</a>`;
   }
 
+  $status.innerHTML = status;
+  toggleSpinner(false);
+}
+
+function setTemplateChosenStatus(event) {
+  const { template: deepLink } = event.data;
+  const status = `{ template: <a href='${deepLink}' target='_blank'>${deepLink}</a> }`;
   $status.innerHTML = status;
   toggleSpinner(false);
 }
