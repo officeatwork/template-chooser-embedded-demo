@@ -23,45 +23,80 @@ function handleEvent(event) {
   }
 
   if (event.data) {
-    event.data.type === "template-chooser-status" && setStatus(event);
+    event.data.type === "template-chooser-status" &&
+      setStatus(event.data.status);
 
     event.data.type === "template-chooser-error" && setErrorStatus(event);
 
     event.data.type === "template-chooser-document-created" &&
-      setCreatedStatus(event);
+      setCreatedResultFile(event);
 
     event.data.type === "template-chooser-document-uploaded" &&
       setUploadedStatus(event);
 
     event.data.type === "template-chooser-template-chosen" &&
-      setTemplateChosenStatus(event);
+      setTemplateChosenResult(event);
   }
 }
 
-function setStatus(event) {
-  const { status } = event.data;
-  $status.innerHTML = status;
-
+function setStatus(status) {
   const showSpinner = status !== "Created";
-  toggleSpinner(showSpinner);
+  updateLatestStatus(status, showSpinner);
+}
+
+function updateLatestStatus(status, showSpinner) {
+  clearOutputIfNeeded(status);
+  turnOffPreviousSpinner();
+  appendLatestStatus(status, showSpinner);
+}
+
+function clearOutputIfNeeded(status) {
+  const newCreationStarted = status === "Preparing";
+  if (newCreationStarted) {
+    $status.innerHTML = "";
+    $resultFile.innerHTML = "";
+  }
+}
+
+function turnOffPreviousSpinner() {
+  document.querySelectorAll("img[data-name='spinner']").forEach((element) => {
+    element.style.display = "none";
+  });
+}
+
+function appendLatestStatus(status, showSpinner) {
+  const statusElement = document.createElement("div");
+  statusElement.className = "status-element";
+
+  if (showSpinner) {
+    const img = document.createElement("img");
+    img.src = "assets/spinner.gif";
+    img.dataset.name = "spinner";
+    img.style.display = "block";
+
+    statusElement.appendChild(img);
+  }
+
+  const span = document.createElement("span");
+  span.innerHTML = status;
+  statusElement.appendChild(span);
+
+  $status.appendChild(statusElement);
 }
 
 function setErrorStatus(event) {
   const status = `Error when creating document, error detail: <b>${JSON.stringify(
     event.data.error
   )}</b>`;
-  $status.innerHTML = status;
-  $resultFile.innerHTML = "";
-  toggleSpinner(false);
+  updateLatestStatus(status, false);
 }
 
-function setCreatedStatus(event) {
+function setCreatedResultFile(event) {
   const { blob, fileName } = event.data;
 
   blobDocument = blob;
   $resultFile.innerHTML = fileName;
   $resultFile.style.display = "inline-block";
-  toggleSpinner(false);
 }
 
 function setUploadedStatus(event) {
@@ -72,22 +107,19 @@ function setUploadedStatus(event) {
     status += `. Response data: redirectUrl=<a href='${redirectUrl}' target='_blank'>${redirectUrl}</a>`;
   }
 
-  $status.innerHTML = status;
-  toggleSpinner(false);
+  updateLatestStatus(status, false);
 }
 
-function setTemplateChosenStatus(event) {
+function setTemplateChosenResult(event) {
   const { template: deepLink } = event.data;
   const status = `{ template: <a href='${deepLink}' target='_blank'>${deepLink}</a> }`;
-  $status.innerHTML = status;
-  toggleSpinner(false);
+  appendLatestStatus(status, false);
 }
 
 function ignite() {
   $template = document.querySelector("#template");
   $uploadUrl = document.querySelector("#upload-url");
   $status = document.querySelector("#status");
-  $spinner = document.querySelector("#spinner");
   $resultFile = document.querySelector("#result-file");
   $reload = document.querySelector("#reload-tc");
   $copyUrl = document.querySelector("#copy-tc-url");
@@ -121,7 +153,6 @@ function ignite() {
     $status.innerHTML = "";
     $resultFile.innerHTML = "";
     $resultFile.style.display = "none";
-    toggleSpinner(false);
     const $iframeContainer = document.getElementById("iframe-container");
 
     const iframe = document.createElement("iframe");
@@ -135,15 +166,14 @@ function ignite() {
   reloadIframe();
 }
 
-function toggleSpinner(show) {
-  $spinner.style.display = show ? "block" : "none";
-}
-
 function buildEmbeddedUrl() {
   const userInputUrl = $tcInputUrl.value || defaultTemplateChooserDomain;
-  const [baseUrl, ...routing] = userInputUrl.split("#");
+  const [baseUrlWithParams, ...routing] = userInputUrl.split("#");
+  const [baseUrl, initialParams] = baseUrlWithParams.split("?");
 
-  let url = `${baseUrl}${buildEmbeddedParams()}`;
+  const embeddedParams = buildEmbeddedParams(initialParams);
+
+  let url = `${baseUrl}${embeddedParams}`;
 
   if (routing && routing.length) {
     url += `#${routing.join("#")}`;
@@ -152,12 +182,12 @@ function buildEmbeddedUrl() {
   return url;
 }
 
-function buildEmbeddedParams() {
+function buildEmbeddedParams(initialParams) {
   const templateParam = buildTemplateParam();
   const injectParam = buildInjectParam();
   const uploadUrlParam = buildUploadUrlParam();
 
-  let params = [templateParam, injectParam, uploadUrlParam]
+  let params = [initialParams, templateParam, injectParam, uploadUrlParam]
     .filter((param) => !!param)
     .join("&");
 

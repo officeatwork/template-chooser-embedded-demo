@@ -123,14 +123,15 @@ input {
 }
 
 .status-container {
+  max-width: 700px;
+  word-break: break-word;
+}
+
+.status-element {
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-.status-message {
-  max-width: 700px;
-  word-break: break-word;
+  min-height: 25px;
 }
 
 .tc-input-url {
