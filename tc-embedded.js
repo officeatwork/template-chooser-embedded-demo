@@ -168,33 +168,38 @@ function ignite() {
 
 function buildEmbeddedUrl() {
   const userInputUrl = $tcInputUrl.value || defaultTemplateChooserDomain;
-  const [baseUrlWithParams, ...routing] = userInputUrl.split("#");
+  const [baseUrlWithParams, hash] = userInputUrl.split("#");
   const [baseUrl, initialParams] = baseUrlWithParams.split("?");
 
-  const embeddedParams = buildEmbeddedParams(initialParams);
+  const queryParams = buildQueryParams(initialParams);
+  const hashWithParams = buildHashParams(hash);
 
-  let url = `${baseUrl}${embeddedParams}`;
-
-  if (routing && routing.length) {
-    url += `#${routing.join("#")}`;
-  }
-
+  const url = `${baseUrl}${queryParams}${hashWithParams}`;
   return url;
 }
 
-function buildEmbeddedParams(initialParams) {
-  const templateParam = buildTemplateParam();
-  const injectParam = buildInjectParam();
-  const uploadUrlParam = buildUploadUrlParam();
+function buildQueryParams(initialParams) {
+  const templateParam = buildTemplateQueryParam();
+  const uploadUrlParam = buildUploadUrlQueryParam();
 
-  let params = [initialParams, templateParam, injectParam, uploadUrlParam]
+  let params = [initialParams, templateParam, uploadUrlParam]
     .filter((param) => !!param)
     .join("&");
 
   return params ? `?${params}` : "";
 }
 
-function buildTemplateParam() {
+function buildHashParams(hash) {
+  const injectHashParam = buildInjectHashParam();
+
+  if (hash) {
+    return `#${hash.trim()}${injectHashParam}`;
+  }
+
+  return injectHashParam ? `#${injectHashParam}` : "";
+}
+
+function buildTemplateQueryParam() {
   const templateUrl = $template.value.trim();
   const base64Template = templateUrl.includes("template=")
     ? new URL(templateUrl).searchParams.get("template")
@@ -203,14 +208,17 @@ function buildTemplateParam() {
   return base64Template ? `template=${base64Template}` : "";
 }
 
-function buildInjectParam() {
-  const customXmlPart = $customXmlPart.value.trim();
-  return customXmlPart ? `inject=${encodeCustomXmlPart(customXmlPart)}` : "";
-}
-
-function buildUploadUrlParam() {
+function buildUploadUrlQueryParam() {
   const uploadUrl = $uploadUrl.value.trim();
   return uploadUrl ? `uploadUrl=${uploadUrl}` : "";
+}
+
+function buildInjectHashParam() {
+  const customXmlPart = $customXmlPart.value.trim();
+  if (!customXmlPart) {
+    return "";
+  }
+  return customXmlPart ? `?inject=${encodeCustomXmlPart(customXmlPart)}` : "";
 }
 
 function insertSampleCustomXmlPart() {
@@ -220,7 +228,7 @@ function insertSampleCustomXmlPart() {
   <Value>de</Value>
 </officeatwork_languages>
 <subject>Invitation to branch opening</subject>
-<subject.de>Einladung zur Geschäfstelleneröffnung</subject.de>
+<subject.de>Einladung zur Geschäftsstelleneröffnung</subject.de>
 <location>
   <city>Zug</city>
   <country>Switzerland</country>
