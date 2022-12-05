@@ -8,6 +8,7 @@ let blobDocument = undefined;
 
 let $template,
   $uploadUrl,
+  $uploadClientId,
   $status,
   $spinner,
   $resultFile,
@@ -119,6 +120,7 @@ function setTemplateChosenResult(event) {
 function ignite() {
   $template = document.querySelector("#template");
   $uploadUrl = document.querySelector("#upload-url");
+  $uploadClientId = document.querySelector("#upload-client-id");
   $status = document.querySelector("#status");
   $resultFile = document.querySelector("#result-file");
   $reload = document.querySelector("#reload-tc");
@@ -181,8 +183,9 @@ function buildEmbeddedUrl() {
 function buildQueryParams(initialParams) {
   const templateParam = buildTemplateQueryParam();
   const uploadUrlParam = buildUploadUrlQueryParam();
+  const uploadClientId = buildUploadClientIdQueryParam();
 
-  let params = [initialParams, templateParam, uploadUrlParam]
+  let params = [initialParams, templateParam, uploadUrlParam, uploadClientId]
     .filter((param) => !!param)
     .join("&");
 
@@ -211,6 +214,11 @@ function buildTemplateQueryParam() {
 function buildUploadUrlQueryParam() {
   const uploadUrl = $uploadUrl.value.trim();
   return uploadUrl ? `uploadUrl=${uploadUrl}` : "";
+}
+
+function buildUploadClientIdQueryParam() {
+  const uploadClientId = $uploadClientId.value.trim();
+  return uploadClientId ? `uploadClientId=${uploadClientId}` : "";
 }
 
 function buildInjectHashParam() {
