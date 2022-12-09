@@ -213,7 +213,7 @@ function buildTemplateQueryParam() {
 
 function buildUploadUrlQueryParam() {
   const uploadUrl = $uploadUrl.value.trim();
-  return uploadUrl ? `uploadUrl=${uploadUrl}` : "";
+  return uploadUrl ? `uploadUrl=${encodeURIComponent(uploadUrl)}` : "";
 }
 
 function buildUploadClientIdQueryParam() {
