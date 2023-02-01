@@ -9,9 +9,8 @@ let blobDocument = undefined;
 let $template,
   $uploadUrl,
   $uploadClientId,
-  $status,
   $spinner,
-  $resultFile,
+  $result,
   $reload,
   $copyUrl,
   $tcInputUrl;
@@ -24,9 +23,6 @@ function handleEvent(event) {
   }
 
   if (event.data) {
-    event.data.type === "template-chooser-status" &&
-      setStatus(event.data.status);
-
     event.data.type === "template-chooser-error" && setErrorStatus(event);
 
     event.data.type === "template-chooser-document-created" &&
@@ -40,89 +36,53 @@ function handleEvent(event) {
   }
 }
 
-function setStatus(status) {
-  const showSpinner = status !== "Created";
-  updateLatestStatus(status, showSpinner);
-}
-
-function updateLatestStatus(status, showSpinner) {
-  clearOutputIfNeeded(status);
-  turnOffPreviousSpinner();
-  appendLatestStatus(status, showSpinner);
-}
-
-function clearOutputIfNeeded(status) {
-  const newCreationStarted = status === "Preparing";
-  if (newCreationStarted) {
-    $status.innerHTML = "";
-    $resultFile.innerHTML = "";
-  }
-}
-
-function turnOffPreviousSpinner() {
-  document.querySelectorAll("img[data-name='spinner']").forEach((element) => {
-    element.style.display = "none";
-  });
-}
-
-function appendLatestStatus(status, showSpinner) {
-  const statusElement = document.createElement("div");
-  statusElement.className = "status-element";
-
-  if (showSpinner) {
-    const img = document.createElement("img");
-    img.src = "assets/spinner.gif";
-    img.dataset.name = "spinner";
-    img.style.display = "block";
-
-    statusElement.appendChild(img);
-  }
-
-  const span = document.createElement("span");
-  span.innerHTML = status;
-  statusElement.appendChild(span);
-
-  $status.appendChild(statusElement);
-}
-
 function setErrorStatus(event) {
-  const status = `Error when creating document, error detail: <b>${JSON.stringify(
-    event.data.error
-  )}</b>`;
-  updateLatestStatus(status, false);
+  const result = `Error when creating document, error detail: <pre><code>${JSON.stringify(
+    event.data.error, null, 4
+  )}</code></pre>`;
+
+  setResult(result);
 }
 
 function setCreatedResultFile(event) {
   const { blob, fileName } = event.data;
 
-  blobDocument = blob;
-  $resultFile.innerHTML = fileName;
-  $resultFile.style.display = "inline-block";
+  const result = `<a id='created-file' href="JavaScript:void(0);">${fileName}</a>`;
+  setResult(result, blob);
 }
 
 function setUploadedStatus(event) {
   const { redirectUrl } = event.data;
 
-  let status = "Document was uploaded";
+  let result = `Document was uploaded at ${new Date().toLocaleTimeString()} <br/>`;
   if (redirectUrl) {
-    status += `. Response data: redirectUrl=<a href='${redirectUrl}' target='_blank'>${redirectUrl}</a>`;
+    result += `Response data: redirectUrl=<a href='${redirectUrl}' target='_blank'>${redirectUrl}</a>`;
   }
 
-  updateLatestStatus(status, false);
+  setResult(result);
 }
 
 function setTemplateChosenResult(event) {
+  // line 67 - 70 can be removed when ticket #14892 is merged
+  const templateChooserEmbeddedUrl = $tcInputUrl.value
+  if(!templateChooserEmbeddedUrl.includes('chooseOnly=true')) {
+    return;
+  }
   const { template: deepLink } = event.data;
-  const status = `{ template: <a href='${deepLink}' target='_blank'>${deepLink}</a> }`;
-  appendLatestStatus(status, false);
+  const result = `Link created at ${new Date().toLocaleTimeString()} <a href='${deepLink}' target='_blank'>Click here</a>`;
+  setResult(result);
+}
+
+function setResult (result, blob) {
+  blobDocument = blob;
+  $result.innerHTML = result;
 }
 
 function ignite() {
   $template = document.querySelector("#template");
   $uploadUrl = document.querySelector("#upload-url");
   $uploadClientId = document.querySelector("#upload-client-id");
-  $status = document.querySelector("#status");
-  $resultFile = document.querySelector("#result-file");
+  $result = document.querySelector("#result");
   $reload = document.querySelector("#reload-tc");
   $copyUrl = document.querySelector("#copy-tc-url");
   $tcInputUrl = document.querySelector("#tc-input-url");
@@ -143,8 +103,11 @@ function ignite() {
     window.navigator.clipboard.writeText(embeddedUrl);
   });
 
-  $resultFile.addEventListener("click", () => {
-    saveAs(blobDocument, $resultFile.innerHTML);
+  $result.addEventListener("click", () => {
+    const templateLink$ = $result.querySelector('#created-file');
+    if (templateLink$) {
+      saveAs(blobDocument, templateLink$.innerHTML);
+    }
   });
 
   $insertSampleCustomXmlPart.addEventListener("click", () => {
@@ -152,9 +115,7 @@ function ignite() {
   });
 
   function reloadIframe() {
-    $status.innerHTML = "";
-    $resultFile.innerHTML = "";
-    $resultFile.style.display = "none";
+    $result.innerHTML = "";
     const $iframeContainer = document.getElementById("iframe-container");
 
     const iframe = document.createElement("iframe");
