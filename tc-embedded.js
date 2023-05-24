@@ -38,7 +38,9 @@ function handleEvent(event) {
 
 function setErrorStatus(event) {
   const result = `Error when creating document, error detail: <pre><code>${JSON.stringify(
-    event.data.error, null, 4
+    event.data.error,
+    null,
+    4
   )}</code></pre>`;
 
   setResult(result);
@@ -63,17 +65,12 @@ function setUploadedStatus(event) {
 }
 
 function setTemplateChosenResult(event) {
-  // line 67 - 70 can be removed when ticket #14892 is merged
-  const templateChooserEmbeddedUrl = $tcInputUrl.value
-  if(!templateChooserEmbeddedUrl.includes('chooseOnly=true')) {
-    return;
-  }
   const { template: deepLink } = event.data;
   const result = `Link created at ${new Date().toLocaleTimeString()} <a href='${deepLink}' target='_blank'>Click here</a>`;
   setResult(result);
 }
 
-function setResult (result, blob) {
+function setResult(result, blob) {
   blobDocument = blob;
   $result.innerHTML = result;
 }
@@ -104,7 +101,7 @@ function ignite() {
   });
 
   $result.addEventListener("click", () => {
-    const templateLink$ = $result.querySelector('#created-file');
+    const templateLink$ = $result.querySelector("#created-file");
     if (templateLink$) {
       saveAs(blobDocument, templateLink$.innerHTML);
     }
@@ -135,18 +132,17 @@ function buildEmbeddedUrl() {
   const [baseUrl, initialParams] = baseUrlWithParams.split("?");
 
   const queryParams = buildQueryParams(initialParams);
-  const hashWithParams = buildHashParams(hash);
+  const hashParams = buildHashParams(hash);
 
-  const url = `${baseUrl}${queryParams}${hashWithParams}`;
+  const url = `${baseUrl}${queryParams}${hashParams}`;
   return url;
 }
 
 function buildQueryParams(initialParams) {
-  const templateParam = buildTemplateQueryParam();
-  const uploadUrlParam = buildUploadUrlQueryParam();
-  const uploadClientId = buildUploadClientIdQueryParam();
+  const uploadUrlParam = buildUploadUrlParam();
+  const uploadClientId = buildUploadClientIdParam();
 
-  let params = [initialParams, templateParam, uploadUrlParam, uploadClientId]
+  let params = [initialParams, uploadUrlParam, uploadClientId]
     .filter((param) => !!param)
     .join("&");
 
@@ -154,40 +150,60 @@ function buildQueryParams(initialParams) {
 }
 
 function buildHashParams(hash) {
-  const injectHashParam = buildInjectHashParam();
+  const templateParam = buildTemplateParam();
+  const injectParam = buildInjectParam();
 
-  if (hash) {
-    return `#${hash.trim()}${injectHashParam}`;
+  if (templateParam && injectParam) {
+    return `#${templateParam}&${injectParam}`;
   }
 
-  return injectHashParam ? `#${injectHashParam}` : "";
+  if (templateParam) {
+    return `#${templateParam}`;
+  }
+
+  if (hash && hash.includes("startLocation=")) {
+    return `#${hash.trim()}&${injectParam}`;
+  }
+
+  return hash ? `#${hash.trim()}?${injectParam}` : `#?${injectParam}`;
 }
 
-function buildTemplateQueryParam() {
-  const templateUrl = $template.value.trim();
-  const base64Template = templateUrl.includes("template=")
-    ? new URL(templateUrl).searchParams.get("template")
-    : templateUrl || "";
+function buildTemplateParam() {
+  const urlOrBase64 = $template.value.trim();
+  if (!urlOrBase64) {
+    return "";
+  }
 
-  return base64Template ? `template=${base64Template}` : "";
+  const templateParam = "template";
+  const isBase64Template = !urlOrBase64.includes(`${templateParam}=`);
+
+  if (isBase64Template) {
+    return `${templateParam}=${urlOrBase64}`;
+  }
+
+  const urlTemplate = new URL(urlOrBase64);
+  const queryOrHash = (urlTemplate.search || urlTemplate.hash).substring(1);
+  const base64Template = new URLSearchParams(queryOrHash).get(templateParam);
+
+  return base64Template ? `${templateParam}=${base64Template}` : "";
 }
 
-function buildUploadUrlQueryParam() {
+function buildUploadUrlParam() {
   const uploadUrl = $uploadUrl.value.trim();
   return uploadUrl ? `uploadUrl=${encodeURIComponent(uploadUrl)}` : "";
 }
 
-function buildUploadClientIdQueryParam() {
+function buildUploadClientIdParam() {
   const uploadClientId = $uploadClientId.value.trim();
   return uploadClientId ? `uploadClientId=${uploadClientId}` : "";
 }
 
-function buildInjectHashParam() {
+function buildInjectParam() {
   const customXmlPart = $customXmlPart.value.trim();
   if (!customXmlPart) {
     return "";
   }
-  return customXmlPart ? `?inject=${encodeCustomXmlPart(customXmlPart)}` : "";
+  return customXmlPart ? `inject=${encodeCustomXmlPart(customXmlPart)}` : "";
 }
 
 function insertSampleCustomXmlPart() {
