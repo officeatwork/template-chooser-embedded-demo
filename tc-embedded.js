@@ -131,14 +131,20 @@ function buildEmbeddedUrl() {
   const [baseUrlWithParams, hash] = userInputUrl.split("#");
   const [baseUrl, initialParams] = baseUrlWithParams.split("?");
 
-  const queryParams = buildQueryParams(initialParams);
   const hashParams = buildHashParams(hash);
+  const queryParams = buildQueryParams(initialParams, hashParams);
 
   const url = `${baseUrl}${queryParams}${hashParams}`;
   return url;
 }
 
-function buildQueryParams(initialParams) {
+function buildQueryParams(initialParams, hashParams) {
+  if (
+    hashParams.includes("uploadUrl") ||
+    hashParams.includes("uploadClientId")
+  ) {
+    return "";
+  }
   const uploadUrlParam = buildUploadUrlParam();
   const uploadClientId = buildUploadClientIdParam();
 
@@ -150,22 +156,37 @@ function buildQueryParams(initialParams) {
 }
 
 function buildHashParams(hash) {
+  const initialHash = hash ? hash.trim() : "";
   const templateParam = buildTemplateParam();
   const injectParam = buildInjectParam();
 
-  if (templateParam && injectParam) {
-    return `#${templateParam}&${injectParam}`;
+  // line 164 - 170 will be removed after ticket 20764 is merged
+  const templateChooserEmbeddedUrl = $tcInputUrl.value;
+  if (
+    templateChooserEmbeddedUrl === defaultTemplateChooserDomain &&
+    !templateParam
+  ) {
+    return injectParam ? `#?${injectParam}` : "";
   }
 
-  if (templateParam) {
-    return `#${templateParam}`;
+  if (!initialHash && !templateParam && !injectParam) {
+    return "";
   }
 
-  if (hash && hash.includes("startLocation=")) {
-    return `#${hash.trim()}&${injectParam}`;
-  }
+  const uploadUrlParam = buildUploadUrlParam();
+  const uploadClientIdParam = buildUploadClientIdParam();
 
-  return hash ? `#${hash.trim()}?${injectParam}` : `#?${injectParam}`;
+  const params = [
+    initialHash,
+    templateParam,
+    injectParam,
+    uploadUrlParam,
+    uploadClientIdParam,
+  ]
+    .filter((param) => !!param)
+    .join("&");
+
+  return params ? `#${params}` : "";
 }
 
 function buildTemplateParam() {
