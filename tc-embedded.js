@@ -160,15 +160,6 @@ function buildHashParams(hash) {
   const templateParam = buildTemplateParam();
   const injectParam = buildInjectParam();
 
-  // line 164 - 170 will be removed after ticket 20764 is merged
-  const templateChooserEmbeddedUrl = $tcInputUrl.value;
-  if (
-    templateChooserEmbeddedUrl === defaultTemplateChooserDomain &&
-    !templateParam
-  ) {
-    return injectParam ? `#?${injectParam}` : "";
-  }
-
   if (!initialHash && !templateParam && !injectParam) {
     return "";
   }
