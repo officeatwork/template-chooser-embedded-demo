@@ -118,6 +118,16 @@ iframe {
   flex: 1;
 }
 
+.input-field .inject {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inject > span {
+  font-weight: 600;
+}
+
 input {
   height: 25px;
 }
@@ -139,6 +149,6 @@ input {
   margin-top: 50px;
 }
 
-#insert-sample-customxmlpart {
-  margin-left: 150px;
+#insert-sample-customxmlpart, #insert-sample-documentproperties {
+  width: 150px;
 }

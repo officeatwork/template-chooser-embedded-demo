@@ -84,8 +84,12 @@ function ignite() {
   $copyUrl = document.querySelector("#copy-tc-url");
   $tcInputUrl = document.querySelector("#tc-input-url");
   $customXmlPart = document.querySelector("#customXmlPart");
+  $documentProperties = document.querySelector("#documentProperties");
   $insertSampleCustomXmlPart = document.querySelector(
     "#insert-sample-customxmlpart"
+  );
+  $insertSampleDocumentProperties = document.querySelector(
+    "#insert-sample-documentproperties"
   );
   $tcInputUrl.value = defaultTemplateChooserDomain;
 
@@ -109,6 +113,9 @@ function ignite() {
 
   $insertSampleCustomXmlPart.addEventListener("click", () => {
     insertSampleCustomXmlPart();
+  });
+  $insertSampleDocumentProperties.addEventListener("click", () => {
+    insertSampleDocumentProperties();
   });
 
   function reloadIframe() {
@@ -212,10 +219,11 @@ function buildUploadClientIdParam() {
 
 function buildInjectParam() {
   const customXmlPart = $customXmlPart.value.trim();
-  if (!customXmlPart) {
+  const documentProperties = $documentProperties.value.trim();
+  if (!customXmlPart && !documentProperties) {
     return "";
   }
-  return customXmlPart ? `inject=${encodeCustomXmlPart(customXmlPart)}` : "";
+  return `inject=${prepareInjectionData(customXmlPart, documentProperties)}`;
 }
 
 function insertSampleCustomXmlPart() {
@@ -238,17 +246,51 @@ function insertSampleCustomXmlPart() {
   $customXmlPart.value = sampleCustomXmlPart;
 }
 
-function encodeCustomXmlPart(customXmlPart) {
-  const injectedData = [
-    {
+function insertSampleDocumentProperties() {
+  const sampleDocumentProperties = `{
+    "type": "customdocumentproperty",
+    "name": "MyProperty",
+    "value": "Some Value"
+ },
+ {
+    "type": "customdocumentproperty",
+    "name": "My2ndProperty",
+    "value": "Some Other Value"
+ },
+ {
+    "type": "builtindocumentproperty",
+    "name": "Title",
+    "value": "Some Title"
+ }`;
+
+  $documentProperties.value = sampleDocumentProperties;
+}
+
+function prepareInjectionData(customXmlPart, documentProperties) {
+  let injectedData = [];
+
+  if (customXmlPart) {
+    injectedData.push({
       type: "customxmlpart",
       base64Xml: encodeUnicodeToBase64(customXmlPart),
-    },
-  ];
+    })
+  }
 
-  const encodedInjectedData = btoa(JSON.stringify(injectedData));
+  if (documentProperties) {
+    try {
+      const documentPropertiesData = JSON.parse(
+        `[${documentProperties}]`
+      );
 
-  return encodedInjectedData;
+      injectedData = injectedData.concat(documentPropertiesData);
+    } catch {
+      // ignore invalid string
+    }
+  }
+
+  const base64EncodedData = btoa(JSON.stringify(injectedData));
+
+  return base64EncodedData;
 }
 
 function encodeUnicodeToBase64(value) {
